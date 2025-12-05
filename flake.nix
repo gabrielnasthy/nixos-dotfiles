@@ -4,18 +4,16 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     flake-utils.url = "github:numtide/flake-utils";
-    devshell.url = "github:numtide/devshell";
   };
 
-  outputs = { self, nixpkgs, flake-utils, devshell }:
+  outputs = { self, nixpkgs, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
-        dslib = devshell.lib.${system};
       in {
-        devShells.default = dslib.mkShell {
+        devShells.default = pkgs.mkShell {
           name = "rust-dev";
-          packages = with pkgs; [
+          buildInputs = with pkgs; [
             # Rust toolchain manager
             rustup
 
@@ -36,12 +34,10 @@
             openssl
           ];
 
-          env = [
-            { name = "RUSTC_WRAPPER"; value = "sccache"; }
-            { name = "SCCACHE_DIR"; value = "${toString ./._sccache}"; }
-            { name = "CARGO_HOME"; value = "${toString ./._cargo}"; }
-            { name = "RUSTUP_HOME"; value = "${toString ./._rustup}"; }
-          ];
+          RUSTC_WRAPPER = "sccache";
+          SCCACHE_DIR = "${toString ./._sccache}";
+          CARGO_HOME = "${toString ./._cargo}";
+          RUSTUP_HOME = "${toString ./._rustup}";
 
           shellHook = ''
             # Initialize rustup with default toolchain if not present
