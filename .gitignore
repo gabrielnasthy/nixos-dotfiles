@@ -1,0 +1,14 @@
+result/
+.direnv/
+.envrc.local
+node_modules/
+.vscode/
+.cache/
+*.log
+.rustup/
+.cargo/
+.pytest_cache/
+__pycache__/
+.venv/
+dist/
+build/
